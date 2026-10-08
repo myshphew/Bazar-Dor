@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans_Bengali } from "next/font/google";
 import "./globals.css";
+import Navbar from "./components/Navbar";
 
 const notoSansBengali = Noto_Sans_Bengali({
   variable: "--font-bangla",
@@ -16,10 +17,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="bn" className="h-full antialiased">
       <body
-        className={`${notoSansBengali.className} min-h-full flex flex-col`}
+        className={`${notoSansBengali.className} min-h-full`}
         cz-shortcut-listen="true"
       >
-        {children}
+        <Navbar />
+        <main className="mt-20 container mx-auto">{children}</main>
       </body>
     </html>
   );
