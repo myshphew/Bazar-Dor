@@ -1,3 +1,6 @@
+import CategoryNavLinks from "./CategoryNavLinks";
+import MarqueeBar from "./MarqueeBar";
+
 export default function Navbar() {
   return (
     <nav className="fixed top-0 z-50 w-full bg-[#f2f2f2]">
@@ -14,6 +17,8 @@ export default function Navbar() {
           <p>Mushfique</p>
         </div>
       </div>
+      <CategoryNavLinks />
+      <MarqueeBar />
     </nav>
   );
 }
