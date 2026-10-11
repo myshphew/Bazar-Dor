@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Noto_Sans_Bengali } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import { Toaster } from "react-hot-toast";
 
 const notoSansBengali = Noto_Sans_Bengali({
   variable: "--font-bangla",
@@ -15,13 +17,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="bn" className="h-full antialiased">
+    <html lang="bn" data-theme="light">
       <body
-        className={`${notoSansBengali.className} min-h-full`}
+        className={`${notoSansBengali.className} antialiased`}
         cz-shortcut-listen="true"
       >
         <Navbar />
-        <main className="mt-20 container mx-auto">{children}</main>
+        <main className="mt-44 min-h-screen">{children}</main>
+        <Footer />
+        <Toaster position="top-center" />
       </body>
     </html>
   );
