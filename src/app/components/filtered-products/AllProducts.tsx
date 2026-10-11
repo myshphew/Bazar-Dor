@@ -10,7 +10,7 @@ interface AllProductsProps {
 
 export default function AllProducts({ products }: AllProductsProps) {
   return (
-    <section className="container mx-auto py-12">
+    <section id="all-products" className="container mx-auto py-12">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">সকল পণ্য</h2>
         <span className="text-xs text-neutral-400">

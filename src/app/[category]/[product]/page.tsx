@@ -5,7 +5,7 @@ import type { ProductInterface } from "@/app/types/interface";
 import PriceTable from "@/app/components/product-details/PriceTable";
 import ProductOverview from "@/app/components/product-details/ProductOverview";
 import MarketPriceDetails from "@/app/components/product-details/MarketPriceDetails";
-import BreadCrumbs from "@/app/components/BreadCrumbs";
+import BreadCrumbs from "@/app/components/nav/BreadCrumbs";
 
 interface ProductPageProps {
   params: Promise<{

@@ -1,7 +1,7 @@
 import { ProductInterface } from "@/app/types/interface";
 import ProductCard from "../components/ProductCard";
 import { toBengaliNumber } from "@/app/lib/utils";
-import BreadCrumbs from "../components/BreadCrumbs";
+import BreadCrumbs from "../components/nav/BreadCrumbs";
 
 interface CategoryPageProps {
   params: Promise<{

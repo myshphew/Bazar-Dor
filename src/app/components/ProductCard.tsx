@@ -1,4 +1,10 @@
 import Link from "next/link";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  Minus,
+} from "lucide-react";
+
 import type { ProductInterface } from "@/app/types/interface";
 import { formatPrice } from "@/app/lib/utils";
 
@@ -8,20 +14,40 @@ export default function ProductCard({
   product: ProductInterface;
 }) {
   const isUp = product.change.dir === "up";
+  const isDown = product.change.dir === "down";
+  const isFlat = product.change.dir === "flat";
+
+  const DirectionIcon = isUp
+    ? ArrowUpRight
+    : isDown
+      ? ArrowDownRight
+      : Minus;
+
+  const changeColor = isUp
+    ? "text-red-600"
+    : isDown
+      ? "text-green-700"
+      : "text-neutral-500";
+
+  const changeBg = isUp
+    ? "bg-red-50"
+    : isDown
+      ? "bg-green-50"
+      : "bg-neutral-100";
 
   return (
     <Link
       href={`/${encodeURIComponent(product.category)}/${encodeURIComponent(product.slug)}`}
-      className="block rounded-xl border border-neutral-200 p-5 transition-all duration-200 hover:-translate-y-1 hover:border-neutral-400 hover:bg-white hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
+      className="group block rounded-xl border border-neutral-200 bg-white p-4 transition-all hover:border-neutral-400 hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
     >
-      {/* Product Information */}
-      <div className="mb-6 flex items-center gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-3xl">
+      {/* Product identity */}
+      <div className="flex items-center gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-2xl">
           {product.image || product.categoryIcon}
         </div>
 
-        <div className="min-w-0">
-          <h3 className="truncate font-semibold text-neutral-900">
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate text-sm font-semibold text-neutral-900">
             {product.nameBn}
           </h3>
 
@@ -31,32 +57,25 @@ export default function ProductCard({
         </div>
       </div>
 
-      {/* Current Price */}
-      <div>
-        <p className="text-sm text-neutral-500">আজকের বাজারদর</p>
+      {/* Price and movement */}
+      <div className="mt-5 flex items-end justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs text-neutral-500">আজকের দাম</p>
 
-        <p className="mt-1 text-2xl font-bold tracking-tight text-neutral-900">
-          ৳{formatPrice(product.today)}
-          <span className="ml-1 text-sm font-normal text-neutral-500">
-            / {product.unit}
-          </span>
-        </p>
-      </div>
+          <p className="mt-1 truncate text-2xl font-bold tracking-tight text-neutral-900">
+            ৳{formatPrice(product.today)}
+          </p>
+        </div>
 
-      {/* Price Change */}
-      <div className="mt-5 flex items-center justify-between border-t border-neutral-200 pt-4">
-        <span className="text-sm text-neutral-500">
-          গতকালের তুলনায়
-        </span>
-
-        <span
-          className={`flex items-center gap-1 text-sm font-semibold ${
-            isUp ? "text-red-600" : "text-green-600"
-          }`}
+        <div
+          className={`flex shrink-0 items-center gap-1 rounded-md px-2 py-1.5 ${changeBg} ${changeColor}`}
         >
-          <span>{isUp ? "↑" : "↓"}</span>
-          {formatPrice(product.change.pct)}%
-        </span>
+          <DirectionIcon size={16} strokeWidth={2.2} />
+
+          <span className="text-sm font-semibold">
+            {isFlat ? "০%" : `${formatPrice(product.change.pct)}%`}
+          </span>
+        </div>
       </div>
     </Link>
   );
