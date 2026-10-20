@@ -1,8 +1,8 @@
 "use client";
 
-import { ProductInterface } from "@/app/types/interface";
+import { ProductInterface } from "@/types/interface";
 import ProductCard from "../ProductCard";
-import { toBengaliNumber } from "@/app/lib/utils";
+import { toBengaliNumber } from "@/lib/utils";
 
 interface AllProductsProps {
   products: ProductInterface[];

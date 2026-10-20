@@ -1,18 +1,18 @@
 "use client";
 
-import { ProductInterface } from "@/app/types/interface";
+import { ProductInterface } from "@/types/interface";
 import ProductCard from "../ProductCard";
-import { toBengaliNumber } from "@/app/lib/utils";
+import { toBengaliNumber } from "@/lib/utils";
 
-interface PriceFallersProps {
+interface PriceRisersProps {
   products: ProductInterface[];
 }
 
-export default function PriceFallers({ products }: PriceFallersProps) {
+export default function PriceRisers({ products }: PriceRisersProps) {
   return (
     <section className="container mx-auto py-12">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">আজ দাম কমেছে</h2>
+        <h2 className="text-xl font-bold">আজ দাম বেড়েছে</h2>
         <span className="text-xs text-neutral-400">
           {toBengaliNumber(products.length)} টি পণ্য
         </span>
@@ -26,7 +26,7 @@ export default function PriceFallers({ products }: PriceFallersProps) {
         </div>
       ) : (
         <p className="py-8 text-center text-sm text-neutral-500">
-          বর্তমানে দাম কমেছে এমন কোনো পণ্য বা শেয়ার নেই।
+          বর্তমানে দাম বেড়েছে এমন কোনো পণ্য নেই।
         </p>
       )}
     </section>

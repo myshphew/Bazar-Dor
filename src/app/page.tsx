@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Hero from "./components/Hero";
-import PriceRisers from "./components/filtered-products/PriceRisers";
-import PriceFallers from "./components/filtered-products/PriceFallers";
-import AllProducts from "./components/filtered-products/AllProducts";
-import { ProductInterface } from "./types/interface";
+import Hero from "@/components/Hero";
+import PriceRisers from "@/components/filtered-products/PriceRisers";
+import PriceFallers from "@/components/filtered-products/PriceFallers";
+import AllProducts from "@/components/filtered-products/AllProducts";
+import { ProductInterface } from "@/types/interface";
 
 export default function Home() {
   const [products, setProducts] = useState<ProductInterface[]>([]);

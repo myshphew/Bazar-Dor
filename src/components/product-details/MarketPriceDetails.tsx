@@ -1,5 +1,5 @@
-import { MarketStats, ProductInterface } from "@/app/types/interface";
-import { formatPrice } from "@/app/lib/utils";
+import { MarketStats, ProductInterface } from "@/types/interface";
+import { formatPrice } from "@/lib/utils";
 
 export default function MarketPriceDetails({
   product,
@@ -9,9 +9,7 @@ export default function MarketPriceDetails({
   markets: MarketStats[];
 }) {
   // Calculate price statistics from available market data.
-  const marketAverages = markets.map(
-    (market) => (market.min + market.max) / 2,
-  );
+  const marketAverages = markets.map((market) => (market.min + market.max) / 2);
 
   const lowestPrice =
     markets.length > 0 ? Math.min(...markets.map((m) => m.min)) : null;
@@ -27,9 +25,7 @@ export default function MarketPriceDetails({
 
   return (
     <section className="mt-5">
-      <h2 className="text-base font-bold text-neutral-900">
-        দামের সারসংক্ষেপ
-      </h2>
+      <h2 className="text-base font-bold text-neutral-900">দামের সারসংক্ষেপ</h2>
 
       {/* Statistics Cards */}
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -95,9 +91,7 @@ export default function MarketPriceDetails({
                     <th className="px-4 py-3 text-right font-medium">
                       সর্বোচ্চ
                     </th>
-                    <th className="px-4 py-3 text-right font-medium">
-                      গড়
-                    </th>
+                    <th className="px-4 py-3 text-right font-medium">গড়</th>
                   </tr>
                 </thead>
 
@@ -109,9 +103,7 @@ export default function MarketPriceDetails({
                       <tr
                         key={`${market.market}-${market.division}-${index}`}
                         className={`border-t border-neutral-200 transition-colors hover:bg-neutral-100 ${
-                          index % 2 === 0
-                            ? "bg-white"
-                            : "bg-neutral-50"
+                          index % 2 === 0 ? "bg-white" : "bg-neutral-50"
                         }`}
                       >
                         <td className="px-4 py-3 font-medium text-neutral-900">

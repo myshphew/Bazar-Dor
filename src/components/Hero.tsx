@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowDownRight, ArrowRight, TrendingUp } from "lucide-react";
-import { getBanglaDate } from "@/app/lib/utils";
+import { getBanglaDate } from "@/lib/utils";
 
 export default function Hero() {
   return (
@@ -19,9 +19,9 @@ export default function Hero() {
         {/* Date Label */}
         <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-neutral-900" />
-          <p className="text-xs font-medium text-neutral-600">
+          {/* <p className="text-xs font-medium text-neutral-600">
             {getBanglaDate()}
-          </p>
+          </p> */}
         </div>
 
         {/* Heading */}

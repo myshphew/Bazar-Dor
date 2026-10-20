@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
-import type { ProductInterface } from "@/app/types/interface";
-import PriceTable from "@/app/components/product-details/PriceTable";
-import ProductOverview from "@/app/components/product-details/ProductOverview";
-import MarketPriceDetails from "@/app/components/product-details/MarketPriceDetails";
-import BreadCrumbs from "@/app/components/nav/BreadCrumbs";
+import type { ProductInterface } from "@/types/interface";
+import PriceTable from "@/components/product-details/PriceTable";
+import ProductOverview from "@/components/product-details/ProductOverview";
+import MarketPriceDetails from "@/components/product-details/MarketPriceDetails";
+import BreadCrumbs from "@/components/nav/BreadCrumbs";
 
 interface ProductPageProps {
   params: Promise<{

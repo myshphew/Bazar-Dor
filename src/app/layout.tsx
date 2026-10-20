@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Noto_Sans_Bengali } from "next/font/google";
 import "./globals.css";
-import Navbar from "./components/nav/Navbar";
-import Footer from "./components/Footer";
+import Navbar from "@/components/nav/Navbar";
+import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
 
 const notoSansBengali = Noto_Sans_Bengali({

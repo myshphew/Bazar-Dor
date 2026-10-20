@@ -1,6 +1,6 @@
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { formatPrice } from "../../lib/utils";
-import { ProductInterface } from "../../types/interface";
+import { formatPrice } from "@/lib/utils";
+import { ProductInterface } from "@/types/interface";
 
 export default function ProductOverview({
   product,
@@ -41,9 +41,7 @@ export default function ProductOverview({
           {formatPrice(product.today)}
         </p>
 
-        <p className="mt-2 text-xs text-neutral-500">
-          টাকা / {product.unit}
-        </p>
+        <p className="mt-2 text-xs text-neutral-500">টাকা / {product.unit}</p>
 
         <span
           className={`mt-2 flex items-center gap-1 text-xs font-semibold ${

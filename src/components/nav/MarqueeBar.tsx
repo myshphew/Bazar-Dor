@@ -5,8 +5,8 @@ import Link from "next/link";
 import Marquee from "react-fast-marquee";
 import { ArrowDown, ArrowUp } from "lucide-react";
 
-import type { ProductInterface } from "@/app/types/interface";
-import { formatPrice } from "@/app/lib/utils";
+import type { ProductInterface } from "@/types/interface";
+import { formatPrice } from "@/lib/utils";
 
 export default function MarqueeBar() {
   const [products, setProducts] = useState<ProductInterface[]>([]);
@@ -39,11 +39,7 @@ export default function MarqueeBar() {
   return (
     <div className="border-t border-neutral-200 bg-neutral-100">
       <div className="container mx-auto">
-        <Marquee
-          pauseOnHover
-          speed={35}
-          gradient={false}
-        >
+        <Marquee pauseOnHover speed={35} gradient={false}>
           {products.map((product) => (
             <Unit key={product.id} display={product} />
           ))}
@@ -62,9 +58,7 @@ function Unit({ display }: { display: ProductInterface }) {
       className="flex items-center gap-2 px-5 py-2.5 text-xs transition-colors hover:bg-neutral-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-neutral-900"
       aria-label={`${display.nameBn}: ${formatPrice(display.today)} টাকা প্রতি ${display.unit}`}
     >
-      <span className="text-base">
-        {display.image || display.categoryIcon}
-      </span>
+      <span className="text-base">{display.image || display.categoryIcon}</span>
 
       <span className="whitespace-nowrap font-medium text-neutral-700">
         {display.nameBn}
@@ -72,9 +66,7 @@ function Unit({ display }: { display: ProductInterface }) {
 
       <span className="whitespace-nowrap font-semibold text-neutral-900">
         ৳{formatPrice(display.today)}
-        <span className="font-normal text-neutral-500">
-          /{display.unit}
-        </span>
+        <span className="font-normal text-neutral-500">/{display.unit}</span>
       </span>
 
       <span
@@ -87,7 +79,6 @@ function Unit({ display }: { display: ProductInterface }) {
         ) : (
           <ArrowDown size={13} strokeWidth={2} />
         )}
-
         {formatPrice(display.change.pct)}%
       </span>
     </Link>

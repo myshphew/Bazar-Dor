@@ -1,12 +1,8 @@
 import Link from "next/link";
-import {
-  ArrowDownRight,
-  ArrowUpRight,
-  Minus,
-} from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 
-import type { ProductInterface } from "@/app/types/interface";
-import { formatPrice } from "@/app/lib/utils";
+import type { ProductInterface } from "@/types/interface";
+import { formatPrice } from "@/lib/utils";
 
 export default function ProductCard({
   product,
@@ -17,11 +13,7 @@ export default function ProductCard({
   const isDown = product.change.dir === "down";
   const isFlat = product.change.dir === "flat";
 
-  const DirectionIcon = isUp
-    ? ArrowUpRight
-    : isDown
-      ? ArrowDownRight
-      : Minus;
+  const DirectionIcon = isUp ? ArrowUpRight : isDown ? ArrowDownRight : Minus;
 
   const changeColor = isUp
     ? "text-red-600"
@@ -51,9 +43,7 @@ export default function ProductCard({
             {product.nameBn}
           </h3>
 
-          <p className="mt-1 text-xs text-neutral-500">
-            প্রতি {product.unit}
-          </p>
+          <p className="mt-1 text-xs text-neutral-500">প্রতি {product.unit}</p>
         </div>
       </div>
 

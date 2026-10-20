@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CategoryInterface } from "@/app/types/interface";
+import { CategoryInterface } from "@/types/interface";
 
 export default function CategoryNavLinks() {
   const [categories, setCategories] = useState<CategoryInterface[]>([]);
