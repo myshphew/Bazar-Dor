@@ -1,18 +1,17 @@
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-export function proxy(request: NextRequest) {
-  const sessionToken = request.cookies.get("better-auth.session_token");
-
-  if (!sessionToken) {
-    const signInUrl = new URL("/signin", request.url);
-    signInUrl.searchParams.set("callbackUrl", request.nextUrl.pathname);
-
-    return NextResponse.redirect(signInUrl);
+export async function proxy(request: NextRequest) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session) {
+    return NextResponse.redirect(new URL("/signin", request.url));
   }
-
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/product/:path*", "/my-profile/:path*"],
+  matcher: ["/:category/:product", "/my-profile/"],
 };

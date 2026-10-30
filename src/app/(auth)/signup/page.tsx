@@ -1,111 +1,195 @@
 "use client";
 
+import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
-import React from "react";
-
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+
+function getCallbackUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const callbackUrl = params.get("callbackUrl");
+  return callbackUrl?.startsWith("/") && !callbackUrl.startsWith("//")
+    ? callbackUrl
+    : "/";
+}
 
 export default function SignUpPage() {
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState< "google" | "github" | null >(null);
+  const isBusy = isLoading || socialLoading !== null;
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
+    setIsLoading(true);
     const formData = new FormData(e.currentTarget);
-    const user = Object.fromEntries(formData.entries()) as {
-      name: string;
-      email: string;
-      image: string;
-      password: string;
+    const user = {
+      name: String(formData.get("name") ?? "").trim(),
+      email: String(formData.get("email") ?? "").trim(),
+      password: String(formData.get("password") ?? ""),
     };
-
-    const { data, error } = await authClient.signUp.email({
-      ...user,
-      callbackURL: "/",
-    });
-
-    if (data) {
-      console.log(data);
-      redirect("/");
+    try {
+      const { error } = await authClient.signUp.email({
+        ...user,
+        callbackURL: getCallbackUrl(),
+      });
+      if (error) {
+        toast.error(error.message || "সাইন আপ করা যায়নি। আবার চেষ্টা করুন।");
+        return;
+      }
+      toast.success("আপনার অ্যাকাউন্ট তৈরি হয়েছে!");
+      router.replace(getCallbackUrl());
+      router.refresh();
+    } catch {
+      toast.error("একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+    } finally {
+      setIsLoading(false);
     }
+  }
 
-    if (error) {
-      console.log(error);
+  async function handleSocialSignUp(provider: "google" | "github") {
+    setSocialLoading(provider);
+    try {
+      const { error } = await authClient.signIn.social({
+        provider,
+        callbackURL: getCallbackUrl(),
+      });
+      if (error) {
+        toast.error(error.message || "সাইন আপ করা যায়নি। আবার চেষ্টা করুন।");
+        setSocialLoading(null);
+      }
+    } catch {
+      toast.error("সংযোগ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+      setSocialLoading(null);
     }
-  };
+  }
 
   const inputClassName =
-    "h-12 w-full rounded-lg border border-neutral-200 bg-white px-4 text-sm text-neutral-900 outline-none transition-colors duration-200 placeholder:text-neutral-400 hover:border-neutral-300 focus:border-neutral-900 focus:ring-4 focus:ring-neutral-900/5";
-
-  const labelClassName = "block text-sm font-medium text-neutral-700";
+    "h-12 w-full rounded-lg border border-[#DCD6C9] bg-[#FBF9F4] px-4 text-sm text-[#20221E] outline-none transition-colors duration-200 placeholder:text-[#969187] hover:border-[#B8B09F] focus:border-[#42634A] focus:ring-4 focus:ring-[#42634A]/10 disabled:cursor-not-allowed disabled:opacity-60";
+  const socialButtonClassName =
+    "flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-[#DCD6C9] bg-[#FBF9F4] text-sm font-medium text-[#20221E] transition-colors hover:bg-[#EDE8DE] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#42634A]/20 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50";
+  const submitButtonClassName =
+    "flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#20221E] px-4 text-sm font-semibold text-[#FBF9F4] transition-colors duration-200 hover:bg-[#42634A] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#42634A]/20 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60";
 
   return (
-    <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-neutral-50 px-4 py-12">
-      <div className="w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
-          অ্যাকাউন্ট তৈরি করুন
-        </h1>
-
-        <p className="mt-2 text-sm leading-6 text-neutral-500">
-          বিনা খরচে সাইন আপ করে সব বিস্তারিত দাম দেখুন।
-        </p>
-
-        <div className="my-6 flex items-center gap-4" aria-hidden="true">
-          <div className="h-px flex-1 bg-neutral-200" />
-          <span className="text-xs font-medium text-neutral-400">
-            ইমেইল দিয়ে সাইন আপ করুন
-          </span>
-          <div className="h-px flex-1 bg-neutral-200" />
+    <main className="container mx-auto mb-8 flex justify-center p-4">
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-[#DCD6C9] bg-[#FBF9F4] p-6 sm:p-8">
+        {/* Heading */}
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-[#20221E]">
+            অ্যাকাউন্ট তৈরি করুন
+          </h1>
+          <p className="text-xs leading-6 text-[#68675F]">
+            বিনা খরচে সাইন আপ করে সব বিস্তারিত দাম দেখুন।
+          </p>
         </div>
 
-        <form onSubmit={onSubmit} autoComplete="on" className="space-y-5">
-          {/* Name */}
-          <div className="space-y-2">
-            <label className={labelClassName}>নাম</label>
-
+        {/* Email Sign Up */}
+        <form
+          onSubmit={handleSubmit}
+          autoComplete="on"
+          className="mt-4 space-y-4"
+        >
+          <div className="space-y-1">
+            <label
+              htmlFor="signup-name"
+              className="block text-xs font-medium text-[#20221E]"
+            >
+              নাম
+            </label>
             <input
+              id="signup-name"
               name="name"
               type="text"
+              autoComplete="name"
+              maxLength={100}
+              required
+              disabled={isBusy}
               className={inputClassName}
               placeholder="আপনার নাম লিখুন"
             />
           </div>
-
-          {/* Email */}
-          <div className="space-y-2">
-            <label className={labelClassName}>ইমেইল</label>
+          <div className="space-y-1">
+            <label
+              htmlFor="signup-email"
+              className="block text-xs font-medium text-[#20221E]"
+            >
+              ইমেইল
+            </label>
             <input
+              id="signup-email"
               name="email"
               type="email"
+              autoComplete="email"
+              required
+              disabled={isBusy}
               className={inputClassName}
-              placeholder="you@example.com"
+              placeholder="আপনার ইমেইল লিখুন"
             />
           </div>
-          
-          {/* Password */}
-          <div className="space-y-2">
-            <label className={labelClassName}>পাসওয়ার্ড</label>
+          <div className="space-y-1">
+            <label
+              htmlFor="signup-password"
+              className="block text-xs font-medium text-[#20221E]"
+            >
+              পাসওয়ার্ড
+            </label>
             <input
+              id="signup-password"
               name="password"
               type="password"
+              autoComplete="new-password"
+              minLength={8}
+              required
+              disabled={isBusy}
               className={inputClassName}
               placeholder="কমপক্ষে ৮ অক্ষর"
             />
           </div>
-
-          {/* Submit Button */}
           <button
             type="submit"
-            className="btn mt-4 flex h-12 w-full items-center justify-center rounded-lg bg-red-700 px-4 text-sm font-semibold text-white transition-colors duration-200 hover:bg-red-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-700/20 active:scale-[0.99]"
+            disabled={isBusy}
+            className={`${submitButtonClassName} mt-4`}
           >
-            সাইন আপ করুন
+            {isLoading ? "অ্যাকাউন্ট তৈরি হচ্ছে..." : "সাইন আপ করুন"}
           </button>
         </form>
 
-        <p className="mt-8 text-center text-sm text-neutral-500">
-          ইতিমধ্যে অ্যাকাউন্ট আছে?{" "}
+        {/* Divider */}
+        <div className="my-6 flex items-center gap-4" aria-hidden="true">
+          <div className="h-px flex-1 bg-[#DCD6C9]" />
+          <span className="text-xs font-medium text-[#868277]">অথবা</span>
+          <div className="h-px flex-1 bg-[#DCD6C9]" />
+        </div>
+
+        {/* Social Sign Up */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            disabled={isBusy}
+            onClick={() => handleSocialSignUp("google")}
+            className={socialButtonClassName}
+          >
+            {socialLoading === "google" ? "সংযোগ করা হচ্ছে..." : "Google"}
+          </button>
+          <button
+            type="button"
+            disabled={isBusy}
+            onClick={() => handleSocialSignUp("github")}
+            className={socialButtonClassName}
+          >
+            {socialLoading === "github" ? "সংযোগ করা হচ্ছে..." : "GitHub"}
+          </button>
+        </div>
+
+        {/* Sign In Link */}
+        <p className="mt-8 text-center text-xs text-[#68675F]">
+          অ্যাকাউন্ট আছে?{" "}
           <Link
             href="/signin"
-            className="font-semibold text-neutral-900 underline-offset-4 transition-colors hover:text-red-700 hover:underline"
+            className="font-semibold text-[#20221E] underline-offset-4 transition-colors hover:text-[#42634A] hover:underline"
           >
             সাইন ইন করুন
           </Link>

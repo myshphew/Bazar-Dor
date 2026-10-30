@@ -2,66 +2,57 @@ import Link from "next/link";
 import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 
 import type { ProductInterface } from "@/types/interface";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getUnitBn } from "@/lib/utils";
 
-export default function ProductCard({
-  product,
-}: {
+interface ProductCardProps {
   product: ProductInterface;
-}) {
+}
+
+export default function ProductCard({ product }: ProductCardProps) {
   const isUp = product.change.dir === "up";
   const isDown = product.change.dir === "down";
   const isFlat = product.change.dir === "flat";
 
   const DirectionIcon = isUp ? ArrowUpRight : isDown ? ArrowDownRight : Minus;
-
   const changeColor = isUp
-    ? "text-red-600"
+    ? "text-[#A54538]"
     : isDown
-      ? "text-green-700"
-      : "text-neutral-500";
-
+      ? "text-[#42634A]"
+      : "text-[#68675F]";
   const changeBg = isUp
-    ? "bg-red-50"
+    ? "bg-[#F2E3DE]"
     : isDown
-      ? "bg-green-50"
-      : "bg-neutral-100";
+      ? "bg-[#E4EBDD]"
+      : "bg-[#F0EDE5]";
 
   return (
     <Link
       href={`/${encodeURIComponent(product.category)}/${encodeURIComponent(product.slug)}`}
-      className="group block rounded-xl border border-neutral-200 bg-white p-4 transition-all hover:border-neutral-400 hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
+      className="flex justify-between group rounded-2xl border border-[#DCD6C9] bg-[#FBF9F4] transition-colors duration-200 hover:border-[#B8B09F] p-4 sm:p-6"
     >
-      {/* Product identity */}
-      <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-2xl">
+      <div className="flex items-center gap-4">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#F4F0E7] text-3xl sm:h-16 sm:w-16 sm:rounded-2xl">
           {product.image || product.categoryIcon}
         </div>
-
-        <div className="min-w-0 flex-1">
-          <h3 className="truncate text-sm font-semibold text-neutral-900">
+        <div className="w-full flex-1">
+          <h1 className="text-base font-semibold tracking-tight text-[#20221E]">
             {product.nameBn}
-          </h3>
-
-          <p className="mt-1 text-xs text-neutral-500">প্রতি {product.unit}</p>
+          </h1>
+          <p className="mt-1 text-[10px] text-[#68675F] sm:text-xs">
+            {getUnitBn(product.unit)}
+          </p>
         </div>
       </div>
 
-      {/* Price and movement */}
-      <div className="mt-5 flex items-end justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-xs text-neutral-500">আজকের দাম</p>
-
-          <p className="mt-1 truncate text-2xl font-bold tracking-tight text-neutral-900">
-            ৳{formatPrice(product.today)}
-          </p>
-        </div>
-
+      <div className="flex flex-col items-end justify-between">
+        <p className="mt-1 text-[10px] text-[#68675F] sm:text-xs">আজকের দাম</p>
+        <p className="mt-1 text-2xl font-bold tracking-tight text-[#20221E] sm:text-3xl">
+          ৳{formatPrice(product.today)}
+        </p>
         <div
-          className={`flex shrink-0 items-center gap-1 rounded-md px-2 py-1.5 ${changeBg} ${changeColor}`}
+          className={`flex shrink-0 items-center gap-1 rounded-md px-2 py-1 ${changeBg} ${changeColor}`}
         >
-          <DirectionIcon size={16} strokeWidth={2.2} />
-
+          <DirectionIcon size={14} strokeWidth={2.2} />
           <span className="text-sm font-semibold">
             {isFlat ? "০%" : `${formatPrice(product.change.pct)}%`}
           </span>

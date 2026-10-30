@@ -13,7 +13,7 @@ export default function CategoryNavLinks() {
     async function getCategories() {
       try {
         const response = await fetch(
-          "https://api-store-indol.vercel.app/api/bazardor/categories",
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/categories`,
         );
 
         if (!response.ok) {
@@ -42,10 +42,10 @@ export default function CategoryNavLinks() {
               key={category.id}
               href={href}
               aria-current={isActive ? "page" : undefined}
-              className={`flex shrink-0 items-center gap-2 border-b-2 px-5 py-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-neutral-900 ${
+              className={`flex shrink-0 items-center gap-2 border-b-2 px-5 py-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#42634A] ${
                 isActive
-                  ? "border-neutral-900 text-neutral-900"
-                  : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-900"
+                  ? "border-[#20221E] text-[#20221E]"
+                  : "border-transparent text-[#68675F] hover:border-[#B8B09F] hover:bg-[#EDE8DE] hover:text-[#20221E]"
               }`}
             >
               <span>{category.icon}</span>

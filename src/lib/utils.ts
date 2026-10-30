@@ -1,13 +1,12 @@
-// 1. Convert English digits to Bengali digits
+// Convert English digits to Bengali digits
 export function toBengaliNumber(num: number | string): string {
   const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
-
   return String(num).replace(/[0-9]/g, (digit) => bengaliDigits[Number(digit)]);
 }
 
-// 2. Format price with commas and Bengali digits
+// Format price with commas and Bengali digits, ignoring the negative sign
 export function formatPrice(price: number): string {
-  return toBengaliNumber(price.toLocaleString("en-IN"));
+  return toBengaliNumber(Math.abs(price).toLocaleString("en-IN"));
 }
 
 // 3. Convert units to Bengali
@@ -24,7 +23,6 @@ export function getUnitBn(unit: string): string {
     packet: "প্রতি প্যাকেট",
     bag: "প্রতি বস্তা",
   };
-
   return units[unit.toLowerCase()] ?? unit;
 }
 
@@ -58,9 +56,8 @@ export function getBanglaDate(): string {
   ];
 
   const day = bengaliDays[date.getDay()];
-  const dayOfMonth = toBengaliNumber(date.getDate());
+  const dateOfMonth = toBengaliNumber(date.getDate());
   const month = bengaliMonths[date.getMonth()];
   const year = toBengaliNumber(date.getFullYear());
-
-  return `${day}, ${dayOfMonth} ${month}, ${year}`;
+  return `${day}, ${dateOfMonth} ${month}, ${year}`;
 }

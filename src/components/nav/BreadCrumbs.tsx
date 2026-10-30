@@ -11,8 +11,10 @@ interface BreadcrumbsProps {
 }
 
 export default function BreadCrumbs({ items }: BreadcrumbsProps) {
+  if (items.length === 0) return null;
+
   return (
-    <nav aria-label="Breadcrumb" className="mb-2">
+    <nav aria-label="Breadcrumb">
       <ol className="flex flex-wrap items-center gap-1.5 text-xs">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
@@ -24,8 +26,9 @@ export default function BreadCrumbs({ items }: BreadcrumbsProps) {
             >
               {index > 0 && (
                 <ChevronRight
-                  size={13}
-                  className="shrink-0 text-neutral-300"
+                  size={14}
+                  strokeWidth={2}
+                  className="pointer-events-none shrink-0 text-[#B8B09F]"
                   aria-hidden="true"
                 />
               )}
@@ -33,7 +36,7 @@ export default function BreadCrumbs({ items }: BreadcrumbsProps) {
               {item.href && !isLast ? (
                 <Link
                   href={item.href}
-                  className="text-neutral-500 transition-colors hover:text-neutral-900"
+                  className="text-[#68675F] transition-colors hover:text-[#42634A]"
                 >
                   {item.label}
                 </Link>
@@ -41,7 +44,7 @@ export default function BreadCrumbs({ items }: BreadcrumbsProps) {
                 <span
                   aria-current={isLast ? "page" : undefined}
                   className={
-                    isLast ? "font-medium text-neutral-900" : "text-neutral-500"
+                    isLast ? "font-medium text-[#20221E]" : "text-[#68675F]"
                   }
                 >
                   {item.label}

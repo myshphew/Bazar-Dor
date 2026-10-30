@@ -1,60 +1,74 @@
-import { ArrowDown, ArrowUp } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
+import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
+import { formatPrice, getUnitBn } from "@/lib/utils";
 import { ProductInterface } from "@/types/interface";
 
-export default function ProductOverview({
-  product,
-}: {
+interface ProductOverviewProps {
   product: ProductInterface;
-}) {
-  const isUp = product.change.dir === "up";
+}
+
+export default function ProductOverview({ product }: ProductOverviewProps) {
   const priceDifference = Math.abs(product.today - product.yesterday);
+  const isUp = product.change.dir === "up";
+  const isDown = product.change.dir === "down";
+  const isFlat = product.change.dir === "flat";
+
+  const DirectionIcon = isUp ? ArrowUpRight : isDown ? ArrowDownRight : Minus;
+
+  const changeColor = isUp
+    ? "text-[#A54538]"
+    : isDown
+      ? "text-[#42634A]"
+      : "text-[#68675F]";
+  const changeBg = isUp
+    ? "bg-[#F2E3DE]"
+    : isDown
+      ? "bg-[#E4EBDD]"
+      : "bg-[#F0EDE5]";
 
   return (
-    <section className="flex flex-row items-center justify-between gap-5 rounded-2xl bg-neutral-50 p-5">
-      <div className="flex items-center gap-4">
-        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-neutral-100 text-4xl">
-          {product.image || product.categoryIcon}
+    <section className="overflow-hidden rounded-2xl border border-[#DCD6C9] bg-[#FBF9F4]">
+      <div className="flex gap-12 p-4 flex-row justify-between sm:p-6">
+        <div className="flex flex-col min-w-0 gap-2">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#F4F0E7] text-3xl sm:h-16 sm:w-16 sm:rounded-2xl">
+            {product.image || product.categoryIcon}
+          </div>
+          <div className="flex min-w-0 flex-col">
+            <h1 className="text-xl font-bold tracking-tight text-[#20221E] sm:text-2xl">
+              {product.nameBn}
+            </h1>
+            <p className="mt-1 text-[10px] text-[#68675F] sm:text-xs">
+              {getUnitBn(product.unit)} · {product.categoryNameBn}
+            </p>
+            <p className="mt-1 text-[10px] text-[#68675F] sm:text-xs">
+              {isFlat
+                ? "গতকালের তুলনায় আজ দাম অপরিবর্তিত"
+                : `গতকালের তুলনায় আজ দাম ${isUp ? "বেড়েছে" : "কমেছে"}`}
+              {` ${formatPrice(priceDifference)} টাকা`}
+            </p>
+          </div>
         </div>
 
-        <div className="min-w-0">
-          <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
-            {product.nameBn}
-          </h1>
-
-          <p className="mt-1 text-xs text-neutral-500">
-            প্রতি {product.unit} · {product.categoryNameBn}
-          </p>
-
-          <p className="mt-2 text-xs leading-5 text-neutral-600">
-            গতকালের তুলনায় আজ দাম {isUp ? "বেড়েছে" : "কমেছে"} ·{" "}
-            {formatPrice(priceDifference)} টাকা
-          </p>
+        <div className="flex shrink-0 items-center justify-between rounded-xl bg-[#F4F0E7] p-4 min-w-32 sm:min-w-40 flex-col sm:rounded-2xl sm:p-6">
+          <div className="text-center">
+            <p className="mt-1 text-[10px] text-[#68675F] sm:text-xs">
+              আজকের দাম
+            </p>
+            <p className="mt-1 text-2xl font-bold tracking-tight text-[#20221E] sm:text-3xl">
+              ৳{formatPrice(product.today)}
+            </p>
+            <p className="mt-1 text-[10px] text-[#68675F] sm:text-xs">
+              {getUnitBn(product.unit)}
+            </p>
+          </div>
+          <div
+            className={`flex shrink-0 items-center gap-1 rounded-md px-2 py-1 ${changeBg} ${changeColor}`}
+          >
+            <DirectionIcon size={14} strokeWidth={2.2} />
+            <span className="text-sm font-semibold">
+              {isFlat ? "০%" : `${formatPrice(product.change.pct)}%`}
+            </span>
+          </div>
         </div>
-      </div>
-
-      {/* Current Price */}
-      <div className="flex h-fit w-30 flex-col items-center justify-center rounded-2xl bg-neutral-100 p-4">
-        <p className="text-xs text-neutral-500">আজকের দাম</p>
-
-        <p className="text-3xl font-bold leading-9 text-neutral-900">
-          {formatPrice(product.today)}
-        </p>
-
-        <p className="mt-2 text-xs text-neutral-500">টাকা / {product.unit}</p>
-
-        <span
-          className={`mt-2 flex items-center gap-1 text-xs font-semibold ${
-            isUp ? "text-red-600" : "text-green-600"
-          }`}
-        >
-          {isUp ? (
-            <ArrowUp size={13} strokeWidth={2} />
-          ) : (
-            <ArrowDown size={13} strokeWidth={2} />
-          )}
-          {formatPrice(product.change.pct)}%
-        </span>
       </div>
     </section>
   );

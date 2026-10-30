@@ -1,34 +1,36 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, LogOut, Save, UserRound } from "lucide-react";
+import { LogOut, Save, UserRound } from "lucide-react";
+import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
 export default function MyProfilePage() {
-  const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending) {
     return (
-      <main className="flex min-h-[60vh] items-center justify-center bg-neutral-50">
-        <p className="text-sm text-neutral-500">Loading your profile...</p>
+      <main className="container mx-auto flex min-h-[60vh] items-center justify-center p-4">
+        <p className="text-sm text-[#68675F]">প্রোফাইল লোড হচ্ছে...</p>
       </main>
     );
   }
 
   if (!session) {
     return (
-      <main className="flex min-h-[60vh] flex-col items-center justify-center gap-3 bg-neutral-50 px-4">
-        <h1 className="text-xl font-bold text-neutral-900">
-          Sign in to view your profile
+      <main className="container mx-auto flex min-h-[60vh] flex-col items-center justify-center gap-3 p-4">
+        <h1 className="text-xl font-bold tracking-tight text-[#20221E]">
+          প্রোফাইল দেখতে সাইন ইন করুন
         </h1>
+
         <Link
           href="/signin?callbackUrl=%2Fmy-profile"
-          className="rounded-lg bg-neutral-900 px-5 py-2.5 text-sm font-semibold text-white"
+          className="flex h-12 items-center justify-center rounded-lg bg-[#20221E] px-5 text-sm font-semibold text-[#FBF9F4] transition-colors hover:bg-[#42634A] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#42634A]/20"
         >
-          Sign in
+          সাইন ইন করুন
         </Link>
       </main>
     );
@@ -57,195 +59,193 @@ function ProfileForm({
 
   const [name, setName] = useState(initialName);
   const [image, setImage] = useState(initialImage);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [signingOut, setSigningOut] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const isBusy = isSaving || isSigningOut;
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError("");
-    setMessage("");
-    setSaving(true);
+    setIsSaving(true);
 
     try {
       const { error } = await authClient.updateUser({
-        name,
+        name: name.trim(),
         image: image.trim() || null,
       });
 
       if (error) {
-        setError(error.message || "Unable to update your profile.");
+        toast.error(
+          error.message || "প্রোফাইল আপডেট করা যায়নি। আবার চেষ্টা করুন।",
+        );
         return;
       }
 
-      setMessage("Your profile has been updated.");
+      toast.success("আপনার প্রোফাইল আপডেট করা হয়েছে।");
       router.refresh();
     } catch {
-      setError("Something went wrong. Please try again.");
+      toast.error("একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।");
     } finally {
-      setSaving(false);
+      setIsSaving(false);
     }
   }
 
   async function handleSignOut() {
-    setSigningOut(true);
+    setIsSigningOut(true);
 
     try {
-      await authClient.signOut();
+      const { error } = await authClient.signOut();
+
+      if (error) {
+        toast.error(error.message || "সাইন আউট করা যায়নি। আবার চেষ্টা করুন।");
+        return;
+      }
+
+      toast.success("সফলভাবে সাইন আউট হয়েছে।");
       router.replace("/signin");
       router.refresh();
     } catch {
-      setError("Unable to sign out. Please try again.");
-      setSigningOut(false);
+      toast.error("সাইন আউট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+    } finally {
+      setIsSigningOut(false);
     }
   }
 
-  const validImage = image.trim() && /^https?:\/\/.+/i.test(image.trim());
+  const trimmedImage = image.trim();
+  const validImage = /^https?:\/\/.+/i.test(trimmedImage);
+
+  const inputClassName =
+    "h-12 w-full rounded-lg border border-[#DCD6C9] bg-[#FBF9F4] px-4 text-sm text-[#20221E] outline-none transition-colors duration-200 placeholder:text-[#969187] hover:border-[#B8B09F] focus:border-[#42634A] focus:ring-4 focus:ring-[#42634A]/10 disabled:cursor-not-allowed disabled:opacity-60";
+
+  const labelClassName = "block text-xs font-medium text-[#20221E]";
+
+  const primaryButtonClassName =
+    "flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#20221E] px-4 text-sm font-semibold text-[#FBF9F4] transition-colors duration-200 hover:bg-[#42634A] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#42634A]/20 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60";
+
+  const secondaryButtonClassName =
+    "inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg border border-[#DCD6C9] bg-[#FBF9F4] px-3 text-xs font-medium text-[#20221E] transition-colors hover:bg-[#EDE8DE] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#42634A]/20 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50";
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] bg-neutral-50 px-4 py-10 sm:py-16">
-      <div className="mx-auto max-w-2xl">
-        <Link
-          href="/"
-          className="mb-6 inline-flex items-center gap-2 text-sm text-neutral-500 transition hover:text-neutral-900"
-        >
-          <ArrowLeft size={16} />
-          Back to Bazar Dor
-        </Link>
+    <main className="container mx-auto mb-8 flex justify-center p-4">
+      <div className="w-full max-w-xl">
+        <div className="overflow-hidden rounded-2xl border border-[#DCD6C9] bg-[#FBF9F4]">
+          {/* Profile Header */}
+          <div className="flex flex-col gap-4 border-b border-[#DCD6C9] p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+            <div className="flex min-w-0 items-center gap-4">
+              {validImage ? (
+                <img
+                  src={trimmedImage}
+                  alt={`${name || "ব্যবহারকারী"}-এর প্রোফাইল ছবি`}
+                  className="h-14 w-14 shrink-0 rounded-full border border-[#DCD6C9] bg-[#F4F0E7] object-cover"
+                />
+              ) : (
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[#DCD6C9] bg-[#F4F0E7] text-[#68675F]">
+                  <UserRound size={26} />
+                </div>
+              )}
 
-        <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
-          <div className="border-b border-neutral-200 px-6 py-6 sm:px-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-neutral-500">
-              Account settings
-            </p>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-neutral-900">
-              My profile
-            </h1>
-            <p className="mt-2 text-sm text-neutral-500">
-              Manage your personal information.
-            </p>
+              <div className="min-w-0">
+                <p className="truncate text-base font-semibold text-[#20221E]">
+                  {name.trim() || "আপনার নাম"}
+                </p>
+                <p className="truncate text-xs leading-5 text-[#68675F]">
+                  {email}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSignOut}
+              disabled={isBusy}
+              className={secondaryButtonClassName}
+            >
+              <LogOut size={15} />
+              {isSigningOut ? "সাইন আউট হচ্ছে..." : "সাইন আউট"}
+            </button>
           </div>
 
+          {/* Edit Profile Form */}
           <div className="p-6 sm:p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="flex items-center gap-4">
-                {validImage ? (
-                  <img
-                    src={image.trim()}
-                    alt="Profile"
-                    className="h-20 w-20 rounded-full border border-neutral-200 object-cover"
-                  />
-                ) : (
-                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-neutral-100 text-neutral-500">
-                    <UserRound size={32} />
-                  </div>
-                )}
+            <div className="mb-6">
+              <h1 className="text-xl font-bold tracking-tight text-[#20221E]">
+                প্রোফাইল সম্পাদনা
+              </h1>
+              <p className="text-xs leading-6 text-[#68675F]">
+                আপনার ব্যক্তিগত তথ্য আপডেট করুন।
+              </p>
+            </div>
 
-                <div>
-                  <p className="font-semibold text-neutral-900">
-                    Profile picture
-                  </p>
-                  <p className="mt-1 text-xs text-neutral-500">
-                    Add a publicly accessible image URL below.
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="image"
-                  className="mb-1.5 block text-sm font-medium text-neutral-700"
-                >
-                  Profile picture URL
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Profile Picture */}
+              <div className="space-y-1">
+                <label htmlFor="image" className={labelClassName}>
+                  ছবির URL
                 </label>
                 <input
                   id="image"
+                  name="image"
                   type="url"
+                  autoComplete="url"
                   value={image}
                   onChange={(e) => setImage(e.target.value)}
+                  disabled={isBusy}
                   placeholder="https://example.com/avatar.jpg"
-                  className="h-11 w-full rounded-lg border border-neutral-200 px-3 text-sm outline-none transition focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+                  className={inputClassName}
                 />
+                <p className="text-xs leading-5 text-[#868277]">
+                  আপনার প্রোফাইল ছবির সরাসরি URL দিন।
+                </p>
               </div>
 
-              <div>
-                <label
-                  htmlFor="name"
-                  className="mb-1.5 block text-sm font-medium text-neutral-700"
-                >
-                  Full name
+              {/* Full Name */}
+              <div className="space-y-1">
+                <label htmlFor="name" className={labelClassName}>
+                  পুরো নাম
                 </label>
                 <input
                   id="name"
+                  name="name"
                   type="text"
                   autoComplete="name"
                   required
+                  maxLength={100}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="h-11 w-full rounded-lg border border-neutral-200 px-3 text-sm outline-none transition focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+                  disabled={isBusy}
+                  className={inputClassName}
+                  placeholder="আপনার নাম লিখুন"
                 />
               </div>
 
-              <div>
-                <label
-                  htmlFor="email"
-                  className="mb-1.5 block text-sm font-medium text-neutral-700"
-                >
-                  Email address
+              {/* Email */}
+              <div className="space-y-1">
+                <label htmlFor="email" className={labelClassName}>
+                  ইমেইল
                 </label>
                 <input
                   id="email"
+                  name="email"
                   type="email"
                   value={email}
-                  disabled
-                  className="h-11 w-full cursor-not-allowed rounded-lg border border-neutral-200 bg-neutral-50 px-3 text-sm text-neutral-500"
+                  readOnly
+                  className={`${inputClassName} cursor-not-allowed bg-[#F0EDE5] text-[#868277]`}
                 />
-                <p className="mt-1.5 text-xs text-neutral-400">
-                  Your email address cannot be changed here.
+                <p className="text-xs leading-5 text-[#868277]">
+                  এখান থেকে ইমেইল পরিবর্তন করা যাবে না।
                 </p>
               </div>
 
-              {error && (
-                <p role="alert" className="text-sm text-red-600">
-                  {error}
-                </p>
-              )}
-
-              {message && (
-                <p role="status" className="text-sm text-green-700">
-                  {message}
-                </p>
-              )}
-
+              {/* Save Changes */}
               <button
                 type="submit"
-                disabled={saving}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-neutral-900 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:opacity-60 sm:w-auto sm:px-6"
+                disabled={isBusy || !name.trim()}
+                className={primaryButtonClassName}
               >
                 <Save size={16} />
-                {saving ? "Saving changes..." : "Save changes"}
+                {isSaving ? "সংরক্ষণ হচ্ছে..." : "পরিবর্তন সংরক্ষণ করুন"}
               </button>
             </form>
-
-            <div className="mt-8 border-t border-neutral-200 pt-6">
-              <h2 className="text-sm font-semibold text-neutral-900">
-                Sign out
-              </h2>
-              <p className="mt-1 text-sm text-neutral-500">
-                Sign out of your Bazar Dor account on this device.
-              </p>
-
-              <button
-                type="button"
-                onClick={handleSignOut}
-                disabled={signingOut}
-                className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-neutral-200 px-4 text-sm font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:opacity-50"
-              >
-                <LogOut size={16} />
-                {signingOut ? "Signing out..." : "Sign out"}
-              </button>
-            </div>
           </div>
         </div>
       </div>

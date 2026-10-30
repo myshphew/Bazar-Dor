@@ -1,11 +1,9 @@
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import type { ProductInterface } from "@/types/interface";
-import PriceTable from "@/components/product-details/PriceTable";
+import BreadCrumbs from "@/components/nav/BreadCrumbs";
 import ProductOverview from "@/components/product-details/ProductOverview";
 import MarketPriceDetails from "@/components/product-details/MarketPriceDetails";
-import BreadCrumbs from "@/components/nav/BreadCrumbs";
+import PriceHistory from "@/components/product-details/PriceHistory";
 
 interface ProductPageProps {
   params: Promise<{
@@ -18,50 +16,43 @@ async function getProduct(
   category: string,
   slug: string,
 ): Promise<ProductInterface | null> {
-  const listResponse = await fetch(
-    "https://openapi.programming-hero.com/api/bazardor/products",
-    {
-      next: { revalidate: 3600 },
-    },
-  );
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!baseUrl) throw new Error("API base URL is not configured.");
 
-  if (!listResponse.ok) {
-    throw new Error("Failed to fetch products");
-  }
+  const productsResponse = await fetch(`${baseUrl}/products`, {
+    next: { revalidate: 3600 },
+  });
 
-  const products: ProductInterface[] = await listResponse.json();
+  if (!productsResponse.ok)
+    throw new Error(`Products API failed: ${productsResponse.status}`);
 
-  const match = products.find(
+  const productsData: ProductInterface[] = await productsResponse.json();
+  const product = productsData.find(
     (item) => item.category === category && item.slug === slug,
   );
 
-  if (!match) return null;
+  if (!product) return null;
 
-  const response = await fetch(
-    `https://openapi.programming-hero.com/api/bazardor/products/${match.id}`,
-    {
-      next: { revalidate: 3600 },
-    },
+  const detailResponse = await fetch(
+    `${baseUrl}/products/${encodeURIComponent(String(product.id))}`,
+    { next: { revalidate: 3600 } },
   );
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch product details");
-  }
+  if (detailResponse.status === 404) return null;
 
-  return response.json();
+  if (!detailResponse.ok) throw new Error("Failed to fetch product details.");
+
+  return (await detailResponse.json()) as ProductInterface;
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { category, product: slug } = await params;
-
   const product = await getProduct(category, slug);
-
   if (!product) notFound();
-
   const markets = product.markets ?? [];
 
   return (
-    <div className="mx-auto min-h-[calc(100vh-110px)] max-w-[1120px] px-4 pb-20 pt-7 sm:px-6 lg:px-0">
+    <main className="container mx-auto p-4">
       <BreadCrumbs
         items={[
           { label: "বাজার দর", href: "/" },
@@ -72,26 +63,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
           { label: product.nameBn },
         ]}
       />
-
-      {/* Product Overview */}
-      <ProductOverview product={product} />
-
-      {/* Market Price Details */}
-      <MarketPriceDetails product={product} markets={markets} />
-
-      {/* Price History */}
-      <PriceTable product={product} />
-
-      {/* Back Navigation */}
-      <div className="mt-5">
-        <Link
-          href={`/${encodeURIComponent(category)}`}
-          className="inline-flex items-center gap-2 text-xs text-neutral-500 transition hover:text-neutral-900"
-        >
-          <ArrowLeft size={15} />
-          {product.categoryNameBn}-এর অন্যান্য পণ্য
-        </Link>
+      <div className="mt-4 mb-10">
+        <ProductOverview product={product} />
+        <MarketPriceDetails product={product} markets={markets} />
+        <PriceHistory product={product} />
       </div>
-    </div>
+    </main>
   );
 }

@@ -1,8 +1,8 @@
 export interface CategoryInterface {
-  id: string; //"chal"
-  slug: string; //"chal"
-  nameBn: string; //"চাল"
-  icon: string; //"🍚"
+  id: string;
+  slug: string;
+  nameBn: string;
+  icon: string;
 }
 
 export interface MarketStats {
