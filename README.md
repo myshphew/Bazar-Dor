@@ -5,7 +5,7 @@
 
 Stay informed about everyday market prices across Bangladesh. Explore essential products, compare prices across markets, and track daily price changes through a clean, responsive interface built for transparency.
 
-**[Live Link](https://bazar-dor.vercel.app)**
+**[Live Link](https://bazar-dor-myshphew.vercel.app)**
 
 ## Tech Stack
 
